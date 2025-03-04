@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 // TODO: Define an interface for the Coordinates object
 interface Coordinates {
-  lat: string;
-  lon: string;
+  lat: number;
+  lon: number;
 }
 
 // TODO: Define a class for the Weather object
@@ -28,9 +29,9 @@ class Weather {
 // TODO: Complete the WeatherService class
 class WeatherService {
   // TODO: Define the baseURL, API key, and city name properties
-  private baseURL: string = process.env.API_BASE_URL || 'https://api.openweathermap.org/';
-  private apiKey: string = process.env.API_KEY || '75d7363343760770608b56789e7f106c';
-  private cityName = '';
+  private baseURL: string =  'https://api.openweathermap.org/';
+  private apiKey: string = '75d7363343760770608b56789e7f106c';
+  private cityName: string = '';
   // TODO: Create fetchLocationData method
   private async fetchLocationData(query: string) {
     const response = await fetch(query);
@@ -38,8 +39,10 @@ class WeatherService {
     return data;
   }
   // TODO: Create destructureLocationData method
-  private destructureLocationData(locationData: Coordinates): Coordinates {
-    const { lat, lon } = locationData;
+  private destructureLocationData(locationData: Coordinates[]) {
+   // console.log('locationData 2', locationData)
+    const [{ lat, lon }] = locationData;
+   // console.log('lat/lon', lat, lon)
     return { lat, lon };
   }
   // TODO: Create buildGeocodeQuery method
@@ -53,22 +56,33 @@ class WeatherService {
   }
   // TODO: Create fetchAndDestructureLocationData method
   private async fetchAndDestructureLocationData() {
+   // console.log(this.cityName)
     const query = this.buildGeocodeQuery(this.cityName);
+   // console.log('query', query)
     const locationData = await this.fetchLocationData(query);
+    // console.log('location', locationData)
     return this.destructureLocationData(locationData);
   }
   // TODO: Create fetchWeatherData method
   private async fetchWeatherData(coordinates: Coordinates) {
     const query = this.buildWeatherQuery(coordinates);
+   // console.log('query', query)
     const response = await fetch(query);
+    //console.log("response", response)
     const data = await response.json();
+    //console.log("data", data)
+    //console.log('main', data.list[0].main, 'weather', data.list[0].weather, 'clouds', data.list[0].clouds, 'wind', data.list[0].wind, 'sys', data.list[0].sys)
     return data;
   }
   // TODO: Build parseCurrentWeather method
   private parseCurrentWeather(response: any) {
-    const { city_name, temp, rh, wind_spd, uv, weather } = response.data[0];
+    //console.log('Response', response)
+    console.log(response.list[0].wind)
+    const weather = response.list[0].weather
+    const temp = response.list[0].main.temp
+    const { name, rh, wind_spd, uv, } = response.list[0].wind;
     const weatherIcon = weather.icon;
-    return new Weather(city_name, temp, rh, wind_spd, uv, weatherIcon);
+    return new Weather(name, temp, rh, wind_spd, uv, weatherIcon);
   }
   // TODO: Complete buildForecastArray method
   private buildForecastArray(_currentWeather: Weather, weatherData: any[]) {
@@ -87,11 +101,19 @@ class WeatherService {
   }
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(city: string) {
+    console.log('Get city Service')
     this.cityName = city;
+    console.log("city", city)
     const coordinates = await this.fetchAndDestructureLocationData();
-    const currentWeather = this.parseCurrentWeather(await this.fetchWeatherData(coordinates));
+    console.log("coordinates", coordinates)
+    const fetchdata=await this.fetchWeatherData(coordinates)
+   // console.log('detchdata', fetchdata)
+    const currentWeather = this.parseCurrentWeather(fetchdata);
+    console.log('currentweather', currentWeather)
     const weatherData = await this.fetchWeatherData(coordinates);
+    console.log('weatherData', weatherData)
     const forecastArray = this.buildForecastArray(currentWeather, weatherData.data);
+    console.log('forecast', forecastArray)
     return { currentWeather, forecastArray };
   }
 }
