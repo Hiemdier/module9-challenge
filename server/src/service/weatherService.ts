@@ -73,48 +73,72 @@ class WeatherService {
     return data;
   }
   // TODO: Build parseCurrentWeather method
-  private parseCurrentWeather(response: any) {
+  private parseCurrentWeather(response: any): Weather {
     const name = response.city.name;
-    //console.log('name', name)
+    // console.log('name', name)
+    
     const weatherIcon = response.list[0].weather[0].icon;
-   // console.log('weatherIcon', weatherIcon)
-    const temp = response.list[0].main.temp
-   // console.log('temp', temp)
-    const humidity = response.list[0].main.humidity
-   // console.log('humidity', humidity)
-    const windSpeed = response.list[0].wind.speed
-   // console.log('windSpeed', windSpeed)
-    return new Weather(name, windSpeed, temp, humidity, weatherIcon);
-  }
+    // console.log('weatherIcon', weatherIcon)
+
+    // Get the temperature in Kelvin from the response
+    const tempInKelvin = response.list[0].main.temp;
+    // Convert Kelvin to Fahrenheit
+    const tempInFahrenheit = this.kelvinToFahrenheit(tempInKelvin);
+    console.log('Temperature in Kelvin:', tempInKelvin, 'Fahrenheit:', tempInFahrenheit);
+
+    const humidity = response.list[0].main.humidity;
+    // console.log('humidity', humidity)
+
+    const windSpeed = response.list[0].wind.speed;
+    // console.log('windSpeed', windSpeed)
+
+    // Return an instance of the Weather class with the converted temperature in Fahrenheit
+    return new Weather(name, windSpeed, tempInFahrenheit, humidity, weatherIcon);
+}
+
+// Function to convert Kelvin to Fahrenheit
+private kelvinToFahrenheit(kelvin: number): number {
+    const fahrenheit = (kelvin - 273.15) * 9 / 5 + 32;
+    return fahrenheit;
+}
   // TODO: Complete buildForecastArray method
-  private buildForecastArray(currentWeather: Weather, weatherData: any) {
+  private buildForecastArray(currentWeather: Weather, weatherData: any): Weather[] {
     const forecastArray = weatherData.list.map((forecast: any) => {
-      console.log('forecast', forecast)
-      const weatherIcon = forecast.weather[0].icon;
-      console.log('weatherIcon', weatherIcon)
-      const temp = forecast.main.temp;
-      console.log('temp', temp)
-      const humidity = forecast.main.humidity;
-      console.log('humidity', humidity)
-      const windSpeed = forecast.wind.speed;
-      console.log('windSpeed', windSpeed)
-      return new Weather(currentWeather.city, temp, humidity, windSpeed, weatherIcon);
+        // Extract weather details from forecast
+        const weatherIcon = forecast.weather[0].icon;
+        // console.log('weatherIcon', weatherIcon)
+
+        // Extract temperature in Kelvin and convert to Fahrenheit
+        const tempInKelvin = forecast.main.temp;
+        const tempInFahrenheit = this.kelvinToFahrenheit(tempInKelvin);
+        // console.log('tempInKelvin', tempInKelvin, 'tempInFahrenheit', tempInFahrenheit)
+
+        // Extract other weather details
+        const humidity = forecast.main.humidity;
+        // console.log('humidity', humidity)
+
+        const windSpeed = forecast.wind.speed;
+        // console.log('windSpeed', windSpeed)
+
+        // Return a new Weather object with converted temperature
+        return new Weather(currentWeather.city, windSpeed, tempInFahrenheit, humidity, weatherIcon);
     });
+
     return forecastArray;
-  }
+}
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(city: string) {
     this.cityName = city;
     const coordinates = await this.fetchAndDestructureLocationData();
-    console.log("coordinates", coordinates)
+    //console.log("coordinates", coordinates)
     const fetchdata=await this.fetchWeatherData(coordinates)
    // console.log('fetchdata', fetchdata)
     const currentWeather = this.parseCurrentWeather(fetchdata);
-    console.log('currentweather', currentWeather)
+    //console.log('currentweather', currentWeather)
     const weatherData = await this.fetchWeatherData(coordinates);
     //console.log('weatherData', weatherData)
     const forecastArray = this.buildForecastArray(currentWeather, weatherData);
-    console.log('forecast', forecastArray)
+    //console.log('forecast', forecastArray)
     return { currentWeather, forecastArray };
   }
 }
