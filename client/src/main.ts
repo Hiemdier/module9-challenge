@@ -78,10 +78,9 @@ Render Functions
 */
 
 const renderCurrentWeather = (currentWeather: any): void => {
-  const { city, icon, iconDescription, temperature, windSpeed, humidity } =
+  const { city, weatherIcon: icon, iconDescription, temperature, windSpeed, humidity } =
     currentWeather;
 
-  // convert the following to typescript
   heading.textContent = `${city}`;
   weatherIcon.setAttribute(
     'src',
@@ -89,14 +88,13 @@ const renderCurrentWeather = (currentWeather: any): void => {
   );
   weatherIcon.setAttribute('alt', iconDescription);
   weatherIcon.setAttribute('class', 'weather-img');
-  heading.append(weatherIcon);
   tempEl.textContent = `Temp: ${temperature}°F`;
   windEl.textContent = `Wind: ${windSpeed} MPH`;
   humidityEl.textContent = `Humidity: ${humidity} %`;
 
   if (todayContainer) {
     todayContainer.innerHTML = '';
-    todayContainer.append(heading, tempEl, windEl, humidityEl);
+    todayContainer.append(heading, weatherIcon, tempEl, windEl, humidityEl);
   }
 };
 
@@ -105,7 +103,7 @@ const renderForecast = (forecast: any): void => {
   const heading = document.createElement('h4');
 
   headingCol.setAttribute('class', 'col-12');
-  heading.textContent = '6-Day Forecast:';
+  heading.textContent = '5-Day Forecast:';
   headingCol.append(heading);
 
   if (forecastContainer) {
@@ -113,7 +111,7 @@ const renderForecast = (forecast: any): void => {
     forecastContainer.append(headingCol);
   }
 
-  for (let i = 0; i < forecast.length; i+=7) {
+  for (let i = 0; i < forecast.length; i+=8) {
     renderForecastCard(forecast[i]);
   }
 };
