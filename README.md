@@ -14,7 +14,7 @@ This project is a 5 day Weather forecast generator.
 - [Questions](#questions)
 
 ## Installation
-Download the repo and open in VS code
+Please use the deployed service [here](https://module9-challenge-8mr5.onrender.com)
 
 ## Usage
 This application is used to get a 5 day weather forecast within the United States
