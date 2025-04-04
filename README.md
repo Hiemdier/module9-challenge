@@ -20,7 +20,7 @@ Please use the deployed service [here](https://module9-challenge-8mr5.onrender.c
 This application is used to get a 5 day weather forecast within the United States
 
 ## Credits
-This project was created by undefined.
+No Collaborators
 
 ## License
 This project is licensed under the MIT license. For more information, please visit [this link](https://opensource.org/licenses/MIT).
